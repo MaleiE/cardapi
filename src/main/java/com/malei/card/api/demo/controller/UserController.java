@@ -31,19 +31,15 @@ public class UserController {
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> add(
             @RequestBody CreateAndUpdateUserDto user){
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-
         User createUser = modelMapper.map(user,User.class);
         userService.saveUser(createUser);
         UserDto userDto = modelMapper.map(userService.saveUser(createUser),UserDto.class);
 
         Link selfLink = linkTo(UserController.class).slash(userDto.getUserId()).withSelfRel();
-        Link cardLink = linkTo(methodOn(CardController.class).getAll(userDto.getUserId().toString())).withRel("cards");
+        Link cardLink = linkTo(methodOn(CardController.class).getAllCard(userDto.getUserId().toString())).withRel("cards");
         userDto.add(selfLink, cardLink);
 
-        return new ResponseEntity<UserDto>(userDto,headers, HttpStatus.CREATED);
+        return new ResponseEntity<UserDto>(userDto, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
@@ -53,10 +49,10 @@ public class UserController {
             @RequestBody CreateAndUpdateUserDto user){
         User updateUser = modelMapper.map(user,User.class);
         updateUser.setId(Long.parseLong(id));
-        UserDto userDto = modelMapper.map((userService.saveUser(updateUser)),UserDto.class);
+        UserDto userDto = modelMapper.map((userService.updateUser(updateUser)),UserDto.class);
 
         Link selfLink = linkTo(UserController.class).slash(userDto.getUserId()).withSelfRel();
-        Link cardLink = linkTo(methodOn(CardController.class).getAll(userDto.getUserId().toString())).withRel("cards");
+        Link cardLink = linkTo(methodOn(CardController.class).getAllCard(userDto.getUserId().toString())).withRel("cards");
         userDto.add(selfLink, cardLink);
 
         return  new ResponseEntity<UserDto>(userDto,HttpStatus.OK);
@@ -69,7 +65,7 @@ public class UserController {
         UserDto userDto = modelMapper.map(userService.getById(id),UserDto.class);
 
         Link selfLink = linkTo(UserController.class).slash(userDto.getUserId()).withSelfRel();
-        Link cardLink = linkTo(methodOn(CardController.class).getAll(userDto.getUserId().toString())).withRel("cards");
+        Link cardLink = linkTo(methodOn(CardController.class).getAllCard(userDto.getUserId().toString())).withRel("cards");
         userDto.add(selfLink, cardLink);
 
         return new ResponseEntity<UserDto>(userDto,HttpStatus.OK);

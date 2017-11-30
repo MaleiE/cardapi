@@ -6,6 +6,7 @@ import com.malei.card.api.demo.model.Card;
 import com.malei.card.api.demo.repository.CardRepository;
 import com.malei.card.api.demo.service.CardService;
 import com.malei.card.api.demo.service.PurchaseService;
+import com.malei.card.api.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,12 @@ public class ImplCardService implements CardService {
     @Autowired
     private CardRepository cardRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Override
-    public Card saveCard(Card card) {
+    public Card saveCard(Card card, String userId) {
+        card.setUsers(userService.getById(userId));
         return cardRepository.save(card);
     }
 

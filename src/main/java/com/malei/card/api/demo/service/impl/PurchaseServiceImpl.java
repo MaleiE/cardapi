@@ -1,6 +1,7 @@
 package com.malei.card.api.demo.service.impl;
 
-import com.malei.card.api.demo.dto.PurchaseDto;
+import com.malei.card.api.demo.dto.CardIdUserIdDto;
+import com.malei.card.api.demo.exception.PurchaseNotFoundException;
 import com.malei.card.api.demo.model.Purchase;
 import com.malei.card.api.demo.repository.PurchaseRepository;
 import com.malei.card.api.demo.service.CardService;
@@ -9,12 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
-
-import static java.lang.Long.parseLong;
 
 @Service
 @Transactional
@@ -28,31 +26,33 @@ public class PurchaseServiceImpl implements PurchaseService {
 
 
     @Override
-    public Purchase getPurchaseById(Long id) {
-        return purchaseRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+    public Purchase getPurchaseById(String id) {
+        return purchaseRepository.findById(Long.parseLong(id))
+                .orElseThrow(PurchaseNotFoundException::new);
+
     }
 
     @Override
-    public Purchase savePurchase(PurchaseDto purchase) throws Exception {
-        Purchase newPurchase = new Purchase();
-        newPurchase.setName(purchase.getName());
-        newPurchase.setPrice(purchase.getPrice());
-        newPurchase.setMonthsInInstallments(purchase.getMonthsInInstallments());
-        LocalDate today;
+    public CardIdUserIdDto getPurchaseCardIdAndUserId(String purchaseId) {
+        return purchaseRepository.getPurchaseCardIdAndUserId(Long.parseLong(purchaseId))
+                .orElseThrow(PurchaseNotFoundException::new);
+    }
+
+    @Override
+    public Purchase savePurchase(Purchase purchase, String cardId){
+
         if(purchase.getDatePurchase() == null){
-            today = LocalDate.now();
-        } else {
-            today = purchase.getDatePurchase();
+            purchase.setDatePurchase(LocalDate.now());
         }
-        newPurchase.setDatePurchase(today);
-        LocalDate DateOfLastPayment =
-                today
+
+        purchase.setDateOfLastPayment(purchase
+                .getDatePurchase()
                 .plusMonths(purchase.getMonthsInInstallments())
-                .withDayOfMonth(15);
-        newPurchase.setDateOfLastPayment(DateOfLastPayment);
-        newPurchase.setCards(cardService.getById(purchase.getCardId()));
-        return purchaseRepository.save(newPurchase);
+                .withDayOfMonth(15));
+
+        purchase.setCards(cardService.getById(cardId));
+
+        return purchaseRepository.save(purchase);
     }
 
     @Override

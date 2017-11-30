@@ -1,5 +1,6 @@
 package com.malei.card.api.demo.service.impl;
 
+import com.malei.card.api.demo.exception.EntityNotFoundException;
 import com.malei.card.api.demo.exception.UserNotFoundException;
 import com.malei.card.api.demo.model.User;
 import com.malei.card.api.demo.repository.UserRepository;

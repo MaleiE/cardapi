@@ -13,10 +13,10 @@ import java.util.Set;
 
 @Entity
 @Table(name = "card")
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, exclude = "purchases")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "purchases")
 public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,7 +30,7 @@ public class Card {
     @JoinColumn(name = "user_id")
     private User users;
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cards")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "cards", fetch = FetchType.LAZY)
     private Set<Purchase> purchases;
 
 
