@@ -2,6 +2,7 @@ package com.malei.card.api.demo.dto;
 
 
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 

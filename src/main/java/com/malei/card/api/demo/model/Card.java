@@ -33,5 +33,4 @@ public class Card {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cards", fetch = FetchType.LAZY)
     private Set<Purchase> purchases;
 
-
 }

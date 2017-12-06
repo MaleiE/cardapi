@@ -1,9 +1,12 @@
 package com.malei.card.api.demo.controller;
 
 import com.malei.card.api.demo.dto.CreateAndUpdateUserDto;
+import com.malei.card.api.demo.dto.PaymentsDto;
 import com.malei.card.api.demo.dto.UserDto;
 import com.malei.card.api.demo.model.User;
+import com.malei.card.api.demo.service.PurchaseService;
 import com.malei.card.api.demo.service.UserService;
+import com.malei.card.api.demo.validation.IdConstraint;
 import com.malei.card.api.demo.validation.UserIdConstraint;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -24,6 +29,10 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+
+    private PurchaseService purchaseService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -78,5 +87,12 @@ public class UserController {
                 userService.deleteUser(userService.getById(id));
 
                 return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(value = "/{id}/payments")
+    public ResponseEntity<List<PaymentsDto>> getUserPayments(
+            @IdConstraint(message = "invalid user ID", entity = "user")
+            @PathVariable String id){
+                return new ResponseEntity<List<PaymentsDto>>(purchaseService.getUserPayments(id, true), HttpStatus.OK);
     }
 }

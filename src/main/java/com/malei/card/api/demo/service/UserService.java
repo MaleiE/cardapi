@@ -1,5 +1,6 @@
 package com.malei.card.api.demo.service;
 
+import com.malei.card.api.demo.dto.PaymentsDto;
 import com.malei.card.api.demo.model.User;
 import org.springframework.stereotype.Service;
 
@@ -11,4 +12,5 @@ public interface UserService {
     User updateUser(User user);
     void deleteUser(User user);
     User saveUser(User user);
+    List<PaymentsDto> getUserPayments(String userId);
 }
