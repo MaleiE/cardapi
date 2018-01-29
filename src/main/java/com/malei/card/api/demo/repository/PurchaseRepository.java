@@ -13,9 +13,6 @@ import java.util.Optional;
 
 public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
-/*
-    List<Purchase> findAllByCardsIdAndCardsUsersId(Sort sort, Long cardId, Long usersId);
-*/
     List<Purchase> findAllByCards_Id(Sort sort, Long cardId);
 
     List<Purchase> findAllByCardsIdAndDateOfLastPaymentIsBefore(Sort sort, Long cardId, LocalDate today);
@@ -28,14 +25,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
     List<Purchase> findAllByCardsIdAndCardsUsersId(/*Sort sort,*/ Long cardId, Long userId);
 
-    @Query(value = "select new com.malei.card.api.demo.dto.CardIdUserIdDto(p.cards.id, c.users.id) from Purchase p inner join p.cards c on c.id = p.cards.id where p.id = :purchaseId")
+    @Query(value = "select new com.malei.card.api.demo.dto.CardIdUserIdDto(c.users.id, p.cards.id) from Purchase p inner join p.cards c on c.id = p.cards.id where p.id = :purchaseId")
     Optional<CardIdUserIdDto> getPurchaseCardIdAndUserId(@Param("purchaseId") Long purchaseId);
-
-
-
-
-/*
-    List<Purchase> findAllByCardsIdAndCardsUsersIdAndDateOfLastPaymentIsBefore(Sort sort, Long usersId, LocalDate today);
-*/
 
 }

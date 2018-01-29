@@ -1,6 +1,7 @@
 package com.malei.card.api.demo.controller;
 
 import com.malei.card.api.demo.dto.CreateAndUpdateUserDto;
+import com.malei.card.api.demo.dto.DebtDto;
 import com.malei.card.api.demo.dto.PaymentsDto;
 import com.malei.card.api.demo.dto.UserDto;
 import com.malei.card.api.demo.model.User;
@@ -89,10 +90,5 @@ public class UserController {
                 return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(value = "/{id}/payments")
-    public ResponseEntity<List<PaymentsDto>> getUserPayments(
-            @IdConstraint(message = "invalid user ID", entity = "user")
-            @PathVariable String id){
-                return new ResponseEntity<List<PaymentsDto>>(purchaseService.getUserPayments(id, true), HttpStatus.OK);
-    }
+
 }

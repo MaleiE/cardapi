@@ -1,6 +1,7 @@
 package com.malei.card.api.demo.service;
 
 import com.malei.card.api.demo.dto.CardIdUserIdDto;
+import com.malei.card.api.demo.dto.DebtDto;
 import com.malei.card.api.demo.dto.PaymentsDto;
 import com.malei.card.api.demo.model.Purchase;
 
@@ -16,6 +17,7 @@ public interface PurchaseService {
     Purchase savePurchase(Purchase purchase, String cardId);
     List<Purchase> getPurchaseByCardId(Long cardId);
     List<Purchase> getPurchaseByUserByCardId(Long cardId, Long userId);
-    List<PaymentsDto> getUserPayments(String userId, Boolean paid);
-
+    List<PaymentsDto> getUserPayments(String userId, String paidParam);
+    DebtDto getDebtUser(String userId, String paidParam);
+    List<PaymentsDto> getCardPayments(String userId, String cardId, Boolean paid);
 }
