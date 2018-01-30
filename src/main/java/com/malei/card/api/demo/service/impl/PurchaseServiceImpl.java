@@ -1,8 +1,8 @@
 package com.malei.card.api.demo.service.impl;
 
 import com.malei.card.api.demo.dto.CardIdUserIdDto;
+import com.malei.card.api.demo.dto.DebtDto;
 import com.malei.card.api.demo.dto.PaymentsDto;
-import com.malei.card.api.demo.dto.PurchaseDto;
 import com.malei.card.api.demo.exception.PurchaseNotFoundException;
 import com.malei.card.api.demo.model.Purchase;
 import com.malei.card.api.demo.repository.PurchaseRepository;
@@ -83,13 +83,8 @@ public class PurchaseServiceImpl implements PurchaseService {
         purchaseRepository.delete(purchase);
     }
 
-//    @Override
-//    public List<Purchase> getAllPurchase() {
-//        return purchaseRepository.findAll();
-//    }
-
     @Override
-    public List<Purchase> getAllPurchase(List<String> params, Long userId, Boolean paid) throws Exception {
+    public List<Purchase> getAllPurchase(List<String> params, Long userId, Boolean paid){
 
         if(!paid){
             String sort = params.get(params.size()-1);
@@ -114,14 +109,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                                 (new Sort(Sort.Direction.DESC, params.get(0)), userId, LocalDate.now());
             }
         }
-        throw  new Exception();
-
-//          return params == null ? purchaseRepository.findAllByCardsIdAndCardsUsersId(cardId, userId)
-//                : params.get(params.size()-1).equals("ask")
-//                ? purchaseRepository
-//                  .findAllByCardsIdAndCardsUsersId(new Sort(Sort.Direction.ASC, params.get(0)), userId, cardId)
-//                : purchaseRepository
-//                  .findAllByCardsIdAndCardsUsersId(new Sort(Sort.Direction.DESC, params.get(0)), userId, cardId);
+        throw  new IllegalArgumentException();
     }
 
     @Override
@@ -129,28 +117,60 @@ public class PurchaseServiceImpl implements PurchaseService {
 
         if(paid){
            List<Purchase> purchases = purchaseRepository.findAllByCards_UsersId(new Sort(Sort.Direction.DESC, "datePurchase"),Long.parseLong(userId));
-           return createPaymentsList(purchases);
+           return createPaymentsList(purchases, LocalDate.now());
         }else {
+
+            LocalDate date = purchaseRepository
+                    .findAllByCards_UsersIdAndDateOfLastPaymentIsBefore(new Sort(Sort.Direction.DESC, "datePurchase"),Long.parseLong(userId), LocalDate.now())
+                    .stream()
+                    .map(Purchase::getDatePurchase)
+                    .min(LocalDate::compareTo).orElse(LocalDate.now());
+
             return createPaymentsList(purchaseRepository
-                    .findAllByCards_UsersIdAndDateOfLastPaymentIsBefore(new Sort(Sort.Direction.DESC, "datePurchase"), Long.parseLong(userId), LocalDate.now()));
+                    .findAllByCards_UsersIdAndDateOfLastPaymentIsBefore(new Sort(Sort.Direction.DESC, "datePurchase"), Long.parseLong(userId), LocalDate.now()), date);
         }
     }
 
-    private List<PaymentsDto> createPaymentsList (List<Purchase> purchases) {
+    @Override
+    public List<PaymentsDto> getCardPayments(String userId, String cardId, Boolean paid){
+        List<Purchase> purchases = purchaseRepository.findAllByCardsIdAndCardsUsersId(Long.parseLong(cardId), Long.parseLong(userId));
 
+        if(paid){
+            return  createPaymentsList(purchases, LocalDate.now());
+        } else {
+            LocalDate date = purchaseRepository.findAllByCardsIdAndCardsUsersId(Long.parseLong(cardId), Long.parseLong(userId))
+                    .stream()
+                    .map(Purchase::getDatePurchase)
+                    .min(LocalDate::compareTo).orElse(LocalDate.now());
+            return createPaymentsList(purchases, date);
+        }
 
-        LocalDate localDate = LocalDate.now();
-        LocalDate localDate1 = localDate.withDayOfMonth(1);
+    }
+
+    @Override
+    public DebtDto getDebtUser(String userId, Boolean paid) {
+
+        DebtDto debt = new DebtDto();
+        debt.setDebt(new BigDecimal(0));
+        getUserPayments(userId,paid).forEach(paymentsDto ->
+                debt.setDebt(debt.getDebt().add(paymentsDto.getPay()))
+
+        );
+        return debt;
+    }
+
+    private List<PaymentsDto> createPaymentsList (List<Purchase> purchases, LocalDate date) {
+        purchases.forEach(System.out::println);
+        System.out.println(date);
 
         List<PaymentsDto> paymentsDtos = new ArrayList<>();
-
-        LocalDate maxDate = purchases.stream().map(Purchase::getDatePurchase).max(LocalDate::compareTo).orElse(localDate);
+        LocalDate maxDate = purchases.stream().map(Purchase::getDatePurchase).max(LocalDate::compareTo).orElse(date);
 
         for (int i = 1; i!=0;) {
             PaymentsDto paymentsDto = new PaymentsDto();
             for (Purchase p : purchases) {
-                if (p.getDatePurchase().with(lastDayOfMonth()).isBefore(localDate1) && localDate1.isBefore(p.getDateOfLastPayment())) {
-                    paymentsDto.setDatePayment(localDate1.plusDays(16));
+                if (p.getDatePurchase().with(lastDayOfMonth()).isBefore(date.plusMonths(1)) && date.isBefore(p.getDateOfLastPayment())) {
+                    paymentsDto.setDatePayment(date.withDayOfMonth(15).plusMonths(1));
                     BigDecimal bigDecimal = p.getPrice().divide(new BigDecimal(p.getMonthsInInstallments()), 2, RoundingMode.HALF_UP);
                     paymentsDto.setPay(paymentsDto.getPay().add(bigDecimal));
                 }
@@ -158,13 +178,12 @@ public class PurchaseServiceImpl implements PurchaseService {
             i = paymentsDto.getPay().intValue();
             if(i!=0) {
                 paymentsDtos.add(paymentsDto);
-            } else if (maxDate.isAfter(localDate1)){
-                paymentsDto.setDatePayment(localDate1);
-                paymentsDtos.add(paymentsDto);
+            } else if (maxDate.isAfter(date)){
                 i++;
             }
-            localDate1 = localDate1.plusMonths(1);
+            date = date.plusMonths(1);
         }
+        paymentsDtos.forEach(System.out::println);
 
         return paymentsDtos;
     }
