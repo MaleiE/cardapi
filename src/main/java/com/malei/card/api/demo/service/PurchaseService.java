@@ -17,7 +17,7 @@ public interface PurchaseService {
     Purchase savePurchase(Purchase purchase, String cardId);
     List<Purchase> getPurchaseByCardId(Long cardId);
     List<Purchase> getPurchaseByUserByCardId(Long cardId, Long userId);
-    List<PaymentsDto> getUserPayments(String userId, Boolean paid);
-    DebtDto getDebtUser(String userId, Boolean paid);
+    List<PaymentsDto> getUserPayments(String userId, String paidParam);
+    DebtDto getDebtUser(String userId, String paidParam);
     List<PaymentsDto> getCardPayments(String userId, String cardId, Boolean paid);
 }
