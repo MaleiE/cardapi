@@ -33,8 +33,8 @@ public class ImplCardService implements CardService {
 
     @Override
     public Card getById(String id) {
-        return  cardRepository.findById(Long.parseLong(id))
-                        .orElseThrow(CardNotFoundException::new);
+        return cardRepository.findById(Long.parseLong(id))
+                .orElseThrow(CardNotFoundException::new);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class ImplCardService implements CardService {
 
     @Override
     public void delete(Card card) {
-         cardRepository.delete(card);
+        cardRepository.delete(card);
     }
 
     @Override

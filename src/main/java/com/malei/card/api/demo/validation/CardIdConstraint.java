@@ -9,10 +9,12 @@ import java.lang.annotation.Target;
 
 
 @Constraint(validatedBy = CardIdValidator.class)
-@Target({ElementType.PARAMETER })
+@Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CardIdConstraint {
     String message() default "Invalid card ID";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }

@@ -8,7 +8,6 @@ import com.malei.card.api.demo.model.Purchase;
 import com.malei.card.api.demo.repository.PurchaseRepository;
 import com.malei.card.api.demo.service.CardService;
 import com.malei.card.api.demo.service.PurchaseService;
-import com.sun.xml.internal.bind.v2.TODO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -47,9 +46,9 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public Purchase savePurchase(Purchase purchase, String cardId){
+    public Purchase savePurchase(Purchase purchase, String cardId) {
 
-        if(purchase.getDatePurchase() == null){
+        if (purchase.getDatePurchase() == null) {
             purchase.setDatePurchase(LocalDate.now());
         }
 
@@ -85,12 +84,12 @@ public class PurchaseServiceImpl implements PurchaseService {
     }
 
     @Override
-    public List<Purchase> getAllPurchase(List<String> params, Long userId, Boolean paid){
+    public List<Purchase> getAllPurchase(List<String> params, Long userId, Boolean paid) {
 
-        if(!paid){
-            String sort = params.get(params.size()-1);
-            params.remove(params.size()-1);
-            if (sort.equals("ask")){
+        if (!paid) {
+            String sort = params.get(params.size() - 1);
+            params.remove(params.size() - 1);
+            if (sort.equals("ask")) {
                 return purchaseRepository
                         .findAllByCards_UsersId(new Sort(Sort.Direction.ASC, params.get(0)), userId);
             } else if (sort.equals("desk")) {
@@ -110,19 +109,50 @@ public class PurchaseServiceImpl implements PurchaseService {
                                 (new Sort(Sort.Direction.DESC, params.get(0)), userId, LocalDate.now());
             }
         }
-        throw  new IllegalArgumentException();
+        throw new IllegalArgumentException();
     }
 
     @Override
-    public List<PaymentsDto> getUserPayments(String userId, String  paidParam){
-
+    public List<PaymentsDto> getUserPayments(String userId, String paidParam) {
         List<Purchase> purchases = purchaseRepository.findAllByCards_UsersId(Long.parseLong(userId));
+
+        return paramsPaymentList(purchases, paidParam);
+    }
+
+    @Override
+    public List<PaymentsDto> getCardPayments(String userId, String cardId, String paidParam) {
+        List<Purchase> purchases = purchaseRepository.findAllByCardsIdAndCardsUsersId(Long.parseLong(cardId), Long.parseLong(userId));
+
+        return paramsPaymentList(purchases, paidParam);
+    }
+
+    @Override
+    public DebtDto getDebtUser(String userId, String paidParam) {
+        return getDebt(getUserPayments(userId, paidParam));
+    }
+
+    @Override
+    public DebtDto getDebtCard(String userId, String cardId, String paidParam) {
+        return getDebt(getCardPayments(userId, cardId, paidParam));
+    }
+
+    private DebtDto getDebt(List<PaymentsDto> paymentsDto) {
+        DebtDto debt = new DebtDto();
+        debt.setDebt(new BigDecimal(0));
+        paymentsDto.forEach(payments ->
+                debt.setDebt(debt.getDebt().add(payments.getPay()))
+        );
+
+        return debt;
+    }
+
+    private List<PaymentsDto> paramsPaymentList(List<Purchase> purchases, String paidParam) {
 
         LocalDate maxDate;
 
-        switch (paidParam){
+        switch (paidParam) {
             case "no":
-                maxDate  = purchases.stream()
+                maxDate = purchases.stream()
                         .map(Purchase::getDateOfLastPayment)
                         .max(LocalDate::compareTo)
                         .orElse(LocalDate.now()); // FIXME orElse
@@ -135,7 +165,7 @@ public class PurchaseServiceImpl implements PurchaseService {
                         .min(LocalDate::compareTo).orElse(LocalDate.now());
                 maxDate = LocalDate.now();
 
-                return createPaymentsList(purchases,date, maxDate);
+                return createPaymentsList(purchases, date, maxDate);
             case "all":
                 maxDate = purchases.stream().map(Purchase::getDateOfLastPayment).max(LocalDate::compareTo).orElse(LocalDate.now());
 
@@ -146,44 +176,17 @@ public class PurchaseServiceImpl implements PurchaseService {
 
                 return createPaymentsList(purchases, datePurchase, maxDate);
             default:
-                throw  new IllegalArgumentException("The url parameter \"paid\" incorrect, default value: \"no\"");
+                throw new IllegalArgumentException("The url parameter \"paid\" incorrect, default value: \"no\"");
 
         }
     }
 
-    @Override
-    public List<PaymentsDto> getCardPayments(String userId, String cardId, Boolean paid){
-        List<Purchase> purchases = purchaseRepository.findAllByCardsIdAndCardsUsersId(Long.parseLong(cardId), Long.parseLong(userId));
 
-        if(paid){
-            return  createPaymentsList(purchases, LocalDate.now(), LocalDate.now()); // FIXME LocalDate ??
-        } else {
-            LocalDate date = purchaseRepository.findAllByCardsIdAndCardsUsersId(Long.parseLong(cardId), Long.parseLong(userId))
-                    .stream()
-                    .map(Purchase::getDatePurchase)
-                    .min(LocalDate::compareTo).orElse(LocalDate.now());
-            return createPaymentsList(purchases, date, LocalDate.now());// FIXME LocalDate ??
-
-        }
-
-    }
-
-    @Override
-    public DebtDto getDebtUser(String userId, String paidParam) {
-
-        DebtDto debt = new DebtDto();
-        debt.setDebt(new BigDecimal(0));
-        getUserPayments(userId,paidParam).forEach(paymentsDto ->
-                debt.setDebt(debt.getDebt().add(paymentsDto.getPay()))
-        );
-        return debt;
-    }
-
-    private List<PaymentsDto> createPaymentsList (List<Purchase> purchases, LocalDate date, LocalDate maxDate ) {
+    private List<PaymentsDto> createPaymentsList(List<Purchase> purchases, LocalDate date, LocalDate maxDate) {
 
         List<PaymentsDto> paymentsDtos = new ArrayList<>();
 
-        for (int i = 1; i!=0;) {
+        for (int i = 1; i != 0; ) {
             PaymentsDto paymentsDto = new PaymentsDto();
 
             for (Purchase p : purchases) {
@@ -194,14 +197,14 @@ public class PurchaseServiceImpl implements PurchaseService {
                 }
             }
             i = paymentsDto.getPay().intValue();
-            if(date.isAfter(maxDate.minusMonths(1))){
+            if (date.isAfter(maxDate.minusMonths(1))) {
                 System.out.println(date);
                 System.out.println(maxDate);
-              i = 0;
+                i = 0;
             }
-            if(i!=0) {
+            if (i != 0) {
                 paymentsDtos.add(paymentsDto);
-            } else if (maxDate.isAfter(date)){
+            } else if (maxDate.isAfter(date)) {
                 i++;
             }
 

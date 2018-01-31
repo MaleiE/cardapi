@@ -21,7 +21,7 @@ public interface PurchaseRepository extends JpaRepository<Purchase, Long> {
 
     List<Purchase> findAllByCards_UsersId(Sort sort, Long UserId);
 
-    List<Purchase> findAllByCards_UsersIdAndDateOfLastPaymentIsBefore( Sort sort, Long userID, LocalDate date);
+    List<Purchase> findAllByCards_UsersIdAndDateOfLastPaymentIsBefore(Sort sort, Long userID, LocalDate date);
 
     List<Purchase> findAllByCardsIdAndCardsUsersId(/*Sort sort,*/ Long cardId, Long userId);
 

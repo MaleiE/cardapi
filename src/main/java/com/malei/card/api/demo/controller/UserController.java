@@ -40,10 +40,10 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> add(
-            @RequestBody CreateAndUpdateUserDto user){
-        User createUser = modelMapper.map(user,User.class);
+            @RequestBody CreateAndUpdateUserDto user) {
+        User createUser = modelMapper.map(user, User.class);
         userService.saveUser(createUser);
-        UserDto userDto = modelMapper.map(userService.saveUser(createUser),UserDto.class);
+        UserDto userDto = modelMapper.map(userService.saveUser(createUser), UserDto.class);
 
         Link selfLink = linkTo(UserController.class).slash(userDto.getUserId()).withSelfRel();
         Link cardLink = linkTo(methodOn(CardController.class).getAllCard(userDto.getUserId().toString())).withRel("cards");
@@ -56,38 +56,38 @@ public class UserController {
     public ResponseEntity<?> update(
             @UserIdConstraint
             @PathVariable String id,
-            @RequestBody CreateAndUpdateUserDto user){
-        User updateUser = modelMapper.map(user,User.class);
+            @RequestBody CreateAndUpdateUserDto user) {
+        User updateUser = modelMapper.map(user, User.class);
         updateUser.setId(Long.parseLong(id));
-        UserDto userDto = modelMapper.map((userService.updateUser(updateUser)),UserDto.class);
+        UserDto userDto = modelMapper.map((userService.updateUser(updateUser)), UserDto.class);
 
         Link selfLink = linkTo(UserController.class).slash(userDto.getUserId()).withSelfRel();
         Link cardLink = linkTo(methodOn(CardController.class).getAllCard(userDto.getUserId().toString())).withRel("cards");
         userDto.add(selfLink, cardLink);
 
-        return  new ResponseEntity<UserDto>(userDto,HttpStatus.OK);
+        return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     public ResponseEntity<UserDto> getUserById(
             @UserIdConstraint
-            @PathVariable String id){
-        UserDto userDto = modelMapper.map(userService.getById(id),UserDto.class);
+            @PathVariable String id) {
+        UserDto userDto = modelMapper.map(userService.getById(id), UserDto.class);
 
         Link selfLink = linkTo(UserController.class).slash(userDto.getUserId()).withSelfRel();
         Link cardLink = linkTo(methodOn(CardController.class).getAllCard(userDto.getUserId().toString())).withRel("cards");
         userDto.add(selfLink, cardLink);
 
-        return new ResponseEntity<UserDto>(userDto,HttpStatus.OK);
+        return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<Void> deleteUser(
             @UserIdConstraint
-            @PathVariable String id){
-                userService.deleteUser(userService.getById(id));
+            @PathVariable String id) {
+        userService.deleteUser(userService.getById(id));
 
-                return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().build();
     }
 
 

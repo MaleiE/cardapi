@@ -11,13 +11,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @SpringBootApplication
 public class DemoApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
-	}
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder managerBuilder) throws Exception {
-		managerBuilder.inMemoryAuthentication().withUser("user").password("user").roles("User");
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder managerBuilder) throws Exception {
+        managerBuilder.inMemoryAuthentication().withUser("user").password("user").roles("User");
+    }
 
 
 }

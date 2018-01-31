@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface CardRepository extends JpaRepository<Card, Long> {
     //@Query("SELECT card FROM Card WHERE Card.id>10 ")
-  //  List<Card> findAll(Pageable pageable);
+    //  List<Card> findAll(Pageable pageable);
 
     List<Card> findAllByUsersId(Sort sort, Long userId);
 }

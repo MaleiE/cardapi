@@ -9,8 +9,12 @@ import java.util.List;
 
 public interface UserService {
     User getById(String id);
+
     User updateUser(User user);
+
     void deleteUser(User user);
+
     User saveUser(User user);
+
     List<PaymentsDto> getUserPayments(String userId);
 }

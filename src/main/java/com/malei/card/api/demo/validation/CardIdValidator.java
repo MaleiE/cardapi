@@ -15,7 +15,7 @@ public class CardIdValidator implements ConstraintValidator<CardIdConstraint, St
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        if(id.matcher(s).matches()){
+        if (id.matcher(s).matches()) {
             cardService.getById(s);
             return true;
         } else {

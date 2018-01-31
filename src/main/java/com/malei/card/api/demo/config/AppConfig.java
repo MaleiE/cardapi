@@ -28,9 +28,9 @@ public class AppConfig {
     }*/
 
     @Bean
-    public Validator validator (final AutowireCapableBeanFactory autowireCapableBeanFactory) {
+    public Validator validator(final AutowireCapableBeanFactory autowireCapableBeanFactory) {
 
-        ValidatorFactory validatorFactory = Validation.byProvider(HibernateValidator.class )
+        ValidatorFactory validatorFactory = Validation.byProvider(HibernateValidator.class)
                 .configure()
                 .constraintValidatorFactory(new SpringConstraintValidatorFactory(autowireCapableBeanFactory))
                 .buildValidatorFactory();
@@ -39,7 +39,7 @@ public class AppConfig {
     }
 
     @Bean
-    public ModelMapper modelMapper(){
+    public ModelMapper modelMapper() {
         return new ModelMapper();
     }
 

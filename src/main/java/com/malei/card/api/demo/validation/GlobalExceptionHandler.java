@@ -20,11 +20,11 @@ public class GlobalExceptionHandler {
         return message;
     }*/
 
-    @ExceptionHandler(value = {ConstraintViolationException.class })
-    public String handle2(ConstraintViolationException e){
+    @ExceptionHandler(value = {ConstraintViolationException.class})
+    public String handle2(ConstraintViolationException e) {
         Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
         StringBuilder strBuilder = new StringBuilder();
-        for (ConstraintViolation<?> violation : violations ) {
+        for (ConstraintViolation<?> violation : violations) {
             strBuilder.append(violation.getMessage()).append("\n");
         }
         return strBuilder.toString();

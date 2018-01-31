@@ -47,7 +47,7 @@ public class PurchaseController {
         PurchaseDto purchaseDto = modelMapper
                 .map(purchaseService
                         .savePurchase(modelMapper
-                                .map(purchase,Purchase.class),cardId),PurchaseDto.class);
+                                .map(purchase, Purchase.class), cardId), PurchaseDto.class);
 
         Link selfLink = linkTo(methodOn(PurchaseController.class).getPurchase(purchaseDto.getPurchaseId().toString())).withSelfRel();
         Link userLink = linkTo(methodOn(UserController.class).getUserById(userId)).withRel("user");
@@ -59,12 +59,11 @@ public class PurchaseController {
     }
 
 
-
     @RequestMapping(value = "/purchase/{id}", method = RequestMethod.PUT)
     public ResponseEntity<?> update(
             @IdConstraint(message = "purchase not found", entity = "purchase")
             @PathVariable String id,
-            @RequestBody CreateAndUpdatePurchaseDto purchase){
+            @RequestBody CreateAndUpdatePurchaseDto purchase) {
 
         PurchaseDto purchaseDto = modelMapper
                 .map(purchaseService
@@ -78,12 +77,13 @@ public class PurchaseController {
 
         purchaseDto.add(selfLink, userLink, cardLink);
 
-        return  new ResponseEntity<PurchaseDto>(purchaseDto,HttpStatus.OK);
+        return new ResponseEntity<PurchaseDto>(purchaseDto, HttpStatus.OK);
     }
+
     @RequestMapping(value = "/purchase/{id}", method = RequestMethod.GET)
     public ResponseEntity<PurchaseDto> getPurchase(
             @IdConstraint(message = "purchase not found", entity = "purchase")
-            @PathVariable String id){
+            @PathVariable String id) {
         PurchaseDto purchaseDto = modelMapper.map(purchaseService.getPurchaseById(id), PurchaseDto.class);
         CardIdUserIdDto cardIdUserIdDto = purchaseService.getPurchaseCardIdAndUserId(purchaseDto.getPurchaseId().toString());
 
@@ -93,29 +93,22 @@ public class PurchaseController {
 
         purchaseDto.add(selfLink, userLink, cardLink);
 
-        return new ResponseEntity<PurchaseDto>(purchaseDto,HttpStatus.OK);
+        return new ResponseEntity<PurchaseDto>(purchaseDto, HttpStatus.OK);
     }
 
     @RequestMapping(value = "users/{userId}/purchase", method = RequestMethod.GET)
     public ResponseEntity<?> getAllPurchaseUser(
             @UserIdConstraint
-            @PathVariable String  userId,
+            @PathVariable String userId,
             @SortParamsConstraint
             @RequestParam(name = "sort", required = false, defaultValue = "id,ask") List<String> sortParams,
             @RequestParam(name = "paid", required = false, defaultValue = "false") String paid) throws Exception {
-        Type listType = new TypeToken<List<PurchaseDto>>() {}.getType();
+        Type listType = new TypeToken<List<PurchaseDto>>() {
+        }.getType();
         List<PurchaseDto> purchaseDtoList = modelMapper
                 .map(purchaseService.getAllPurchase(sortParams, Long.parseLong(userId), Boolean.parseBoolean(paid)), listType);
 
-        List<PurchaseDto> purchaseDtos = purchaseDtoList.stream().peek((p) -> {
-            CardIdUserIdDto cardIdUserIdDto = purchaseService.getPurchaseCardIdAndUserId(p.getPurchaseId().toString());
-
-            Link selfLink = linkTo(methodOn(PurchaseController.class).getPurchase(p.getPurchaseId().toString())).withSelfRel();
-            Link userLink = linkTo(methodOn(UserController.class).getUserById(userId)).withRel("user");
-            Link cardLink = linkTo(methodOn(CardController.class).getCard(cardIdUserIdDto.getUserId(), cardIdUserIdDto.getCardId())).withRel("card");
-
-            p.add(selfLink, userLink, cardLink);
-        }).collect(Collectors.toList());
+        List<PurchaseDto> purchaseDtos = addLinkPurchase(purchaseDtoList, userId);
 
         Resources<PurchaseDto> purchaseDtoResources = new Resources<>(purchaseDtos);
 
@@ -124,7 +117,7 @@ public class PurchaseController {
 
         purchaseDtoResources.add(selfLink, userLink);
 
-        return new ResponseEntity<>(purchaseDtoResources,HttpStatus.OK);
+        return new ResponseEntity<>(purchaseDtoResources, HttpStatus.OK);
     }
 
     @RequestMapping(value = "users/{userId}/cards/{cardId}/purchase", method = RequestMethod.GET)
@@ -132,20 +125,13 @@ public class PurchaseController {
             @UserIdConstraint
             @PathVariable String userId,
             @CardIdConstraint
-            @PathVariable String cardId){
-        Type listType = new TypeToken<List<PurchaseDto>>() {}.getType();
+            @PathVariable String cardId) {
+        Type listType = new TypeToken<List<PurchaseDto>>() {
+        }.getType();
         List<PurchaseDto> purchaseDtoList = modelMapper
-                .map(purchaseService.getPurchaseByUserByCardId(Long.parseLong(cardId),Long.parseLong(userId)), listType);
+                .map(purchaseService.getPurchaseByUserByCardId(Long.parseLong(cardId), Long.parseLong(userId)), listType);
 
-        List<PurchaseDto> purchaseDtos = purchaseDtoList.stream().peek((p) -> {
-            CardIdUserIdDto cardIdUserIdDto = purchaseService.getPurchaseCardIdAndUserId(p.getPurchaseId().toString());
-
-            Link selfLink = linkTo(methodOn(PurchaseController.class).getPurchase(p.getPurchaseId().toString())).withSelfRel();
-            Link userLink = linkTo(methodOn(UserController.class).getUserById(userId)).withRel("user");
-            Link cardLink = linkTo(methodOn(CardController.class).getCard(cardIdUserIdDto.getUserId(), cardIdUserIdDto.getCardId())).withRel("card");
-
-            p.add(selfLink, userLink, cardLink);
-        }).collect(Collectors.toList());
+        List<PurchaseDto> purchaseDtos = addLinkPurchase(purchaseDtoList, userId);
 
         Resources<PurchaseDto> purchaseDtoResources = new Resources<>(purchaseDtos);
 
@@ -154,7 +140,19 @@ public class PurchaseController {
 
         purchaseDtoResources.add(selfLink, userLink);
 
-        return new ResponseEntity<>(purchaseDtoResources,HttpStatus.OK);
+        return new ResponseEntity<>(purchaseDtoResources, HttpStatus.OK);
+    }
+
+    private List<PurchaseDto> addLinkPurchase(List<PurchaseDto> purchases, String userId) {
+        return purchases.stream().peek((p) -> {
+            CardIdUserIdDto cardIdUserIdDto = purchaseService.getPurchaseCardIdAndUserId(p.getPurchaseId().toString());
+
+            Link selfLink = linkTo(methodOn(PurchaseController.class).getPurchase(p.getPurchaseId().toString())).withSelfRel();
+            Link userLink = linkTo(methodOn(UserController.class).getUserById(userId)).withRel("user");
+            Link cardLink = linkTo(methodOn(CardController.class).getCard(cardIdUserIdDto.getUserId(), cardIdUserIdDto.getCardId())).withRel("card");
+
+            p.add(selfLink, userLink, cardLink);
+        }).collect(Collectors.toList());
     }
 
 }

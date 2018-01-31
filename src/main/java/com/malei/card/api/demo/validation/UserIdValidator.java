@@ -7,7 +7,7 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.regex.Pattern;
 
-public class UserIdValidator  implements ConstraintValidator<UserIdConstraint, String> {
+public class UserIdValidator implements ConstraintValidator<UserIdConstraint, String> {
 
     @Autowired
     UserService userService;
@@ -16,7 +16,7 @@ public class UserIdValidator  implements ConstraintValidator<UserIdConstraint, S
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        if(id.matcher(s).matches()){
+        if (id.matcher(s).matches()) {
             userService.getById(s);
             return true;
         } else {

@@ -24,8 +24,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getById(String id) {
-            return userRepository.findById(Long.parseLong(id))
-                    .orElseThrow(UserNotFoundException::new);
+        return userRepository.findById(Long.parseLong(id))
+                .orElseThrow(UserNotFoundException::new);
     }
 
     @Override
