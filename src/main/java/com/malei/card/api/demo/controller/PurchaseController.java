@@ -36,7 +36,7 @@ public class PurchaseController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @RequestMapping(value = "users/{userId}/cards/{cardId}/purchase", method = RequestMethod.POST)
+    @PostMapping(value = "users/{userId}/cards/{cardId}/purchase")
     public ResponseEntity<PurchaseDto> add(
             @UserIdConstraint
             @PathVariable(name = "userId") String userId,
@@ -59,7 +59,7 @@ public class PurchaseController {
     }
 
 
-    @RequestMapping(value = "/purchase/{id}", method = RequestMethod.PUT)
+    @PutMapping(value = "/purchase/{id}")
     public ResponseEntity<?> update(
             @IdConstraint(message = "purchase not found", entity = "purchase")
             @PathVariable String id,
@@ -80,7 +80,7 @@ public class PurchaseController {
         return new ResponseEntity<PurchaseDto>(purchaseDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/purchase/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/purchase/{id}")
     public ResponseEntity<PurchaseDto> getPurchase(
             @IdConstraint(message = "purchase not found", entity = "purchase")
             @PathVariable String id) {
@@ -96,7 +96,7 @@ public class PurchaseController {
         return new ResponseEntity<PurchaseDto>(purchaseDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "users/{userId}/purchase", method = RequestMethod.GET)
+    @GetMapping(value = "users/{userId}/purchase")
     public ResponseEntity<?> getAllPurchaseUser(
             @UserIdConstraint
             @PathVariable String userId,
@@ -120,7 +120,7 @@ public class PurchaseController {
         return new ResponseEntity<>(purchaseDtoResources, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "users/{userId}/cards/{cardId}/purchase", method = RequestMethod.GET)
+    @GetMapping(value = "users/{userId}/cards/{cardId}/purchase")
     public ResponseEntity<?> getAllPurchaseByCard(
             @UserIdConstraint
             @PathVariable String userId,

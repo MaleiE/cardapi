@@ -24,7 +24,7 @@ public class PaidAndDebtController {
     @Autowired
     private PurchaseService purchaseService;
 
-    @RequestMapping(value = "users/{id}/payments", method = RequestMethod.GET)
+    @GetMapping(value = "users/{id}/payments")
     public ResponseEntity<Resources<PaymentsDto>> getUserPayments(
             @IdConstraint(message = "invalid user ID", entity = "user")
             @PathVariable String id,
@@ -40,7 +40,7 @@ public class PaidAndDebtController {
         return new ResponseEntity<Resources<PaymentsDto>>(paymentsDtoResources, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "users/{id}/debts")
+    @GetMapping(value = "users/{id}/debts")
     public ResponseEntity<DebtDto> getUserDebt(
             @IdConstraint(message = "invalid user ID", entity = "user")
             @PathVariable String id,
@@ -55,7 +55,7 @@ public class PaidAndDebtController {
         return new ResponseEntity<DebtDto>(debtDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "users/{userId}/cards/{cardId}/debts")
+    @GetMapping(value = "users/{userId}/cards/{cardId}/debts")
     public ResponseEntity<DebtDto> getCardDebt(
             @IdConstraint(message = "invalid user ID", entity = "user")
             @PathVariable String userId,
@@ -72,7 +72,7 @@ public class PaidAndDebtController {
         return new ResponseEntity<DebtDto>(debtDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "users/{userId}/cards/{cardId}/payments")
+    @GetMapping(value = "users/{userId}/cards/{cardId}/payments")
     public ResponseEntity<Resources<PaymentsDto>> getCardPayments(
             @IdConstraint(message = "invalid user ID", entity = "user")
             @PathVariable String userId,

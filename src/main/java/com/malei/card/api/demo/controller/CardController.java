@@ -34,7 +34,7 @@ public class CardController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     ResponseEntity<CardDto> addCard(
             @UserIdConstraint
             @PathVariable String userId,
@@ -49,7 +49,7 @@ public class CardController {
         return new ResponseEntity<CardDto>(cardDto, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{cardId}", method = RequestMethod.GET)
+    @GetMapping(value = "/{cardId}")
     ResponseEntity<CardDto> getCard(
             @UserIdConstraint
             @PathVariable String userId,
@@ -63,7 +63,7 @@ public class CardController {
         return new ResponseEntity<CardDto>(cardDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{cardId}", method = RequestMethod.PUT)
+    @PutMapping(value = "/{cardId}")
     ResponseEntity<CardDto> updateCard(
             @UserIdConstraint
             @PathVariable String userId,
@@ -82,7 +82,7 @@ public class CardController {
         return new ResponseEntity<CardDto>(cardDto, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{cardId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{cardId}")
     ResponseEntity<Void> delete(
             @CardIdConstraint
             @PathVariable String cardId,
@@ -92,7 +92,7 @@ public class CardController {
         return ResponseEntity.noContent().build();
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping()
     ResponseEntity<?> getAllCard(
             @UserIdConstraint
             @PathVariable String userId) {

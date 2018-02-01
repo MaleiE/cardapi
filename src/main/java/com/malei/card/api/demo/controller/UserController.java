@@ -1,25 +1,19 @@
 package com.malei.card.api.demo.controller;
 
 import com.malei.card.api.demo.dto.CreateAndUpdateUserDto;
-import com.malei.card.api.demo.dto.DebtDto;
-import com.malei.card.api.demo.dto.PaymentsDto;
 import com.malei.card.api.demo.dto.UserDto;
 import com.malei.card.api.demo.model.User;
 import com.malei.card.api.demo.service.PurchaseService;
 import com.malei.card.api.demo.service.UserService;
-import com.malei.card.api.demo.validation.IdConstraint;
 import com.malei.card.api.demo.validation.UserIdConstraint;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.Link;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -38,7 +32,7 @@ public class UserController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping()
     public ResponseEntity<?> add(
             @RequestBody CreateAndUpdateUserDto user) {
         User createUser = modelMapper.map(user, User.class);
@@ -52,7 +46,7 @@ public class UserController {
         return new ResponseEntity<UserDto>(userDto, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @PutMapping(value = "/{id}")
     public ResponseEntity<?> update(
             @UserIdConstraint
             @PathVariable String id,
@@ -68,7 +62,7 @@ public class UserController {
         return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @GetMapping(value = "/{id}")
     public ResponseEntity<UserDto> getUserById(
             @UserIdConstraint
             @PathVariable String id) {
@@ -81,7 +75,7 @@ public class UserController {
         return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteUser(
             @UserIdConstraint
             @PathVariable String id) {
